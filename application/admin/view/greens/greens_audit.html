@@ -1,0 +1,197 @@
+{include file="public/header"}
+<!-- 引用批量上传文件插件样式 -->
+    <link rel="stylesheet" href="__UPDATE__/control/css/zyUpload.css" type="text/css">
+
+    <script type="text/javascript" src="__UPDATE__/jquery-1.7.2.js"></script>
+    <!-- 引用核心层插件 -->
+    <script type="text/javascript" src="__UPDATE__/core/zyFile.js"></script>
+<style>
+    .site-demo-upload,
+    .site-demo-upload img{width: 200px; height: 200px; border-radius: 100%;}
+    .site-demo-upload{position: relative; background: #e2e2e2;}
+    .site-demo-upload .site-demo-upbar{position: absolute; top: 50%; left: 50%; margin: -18px 0 0 -56px;}
+    .site-demo-upload .layui-upload-button{background-color: rgba(0,0,0,.2); color: rgba(255,255,255,1);}
+    .upload-img{
+        margin-left: 95px;
+        margin-top: 10px;
+    }
+    .upload-img img{
+        margin-top: -38px;
+    }
+</style>
+<div class="main-wrap">
+    <blockquote class="layui-elem-quote fhui-admin-main_hd">
+        <h2>审核菜单</h2>
+    </blockquote>
+    <form class="layui-form">
+    <input type="hidden" name="c_id" value="{$c_id}"><!-- 菜单ID -->
+        <div class="layui-form-item">
+            <label class="layui-form-label">菜单名称</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" readonly="readonly" value="{$DataStr['name']}" type="text" name="name" placeholder="菜单名称"  lay-verify="name">
+            </div>
+        </div>
+         <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">封面图</label>
+            <div class="site-demo-upload upload-img">
+                <img id="default_img" src="/FlowProject/Food_test/public{$DataStr['img']}">
+                <div class="site-demo-upbar">
+                        <!-- <input type="file" name="file" class="layui-upload-file" id="upload_ad_image"> -->
+                        <input type="hidden" id="images" name="img" value="{$DataStr['img']}">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">菜单描述</label>
+            <div class="layui-input-block">
+                <textarea name="describe" readonly="readonly" id="seo_description"  placeholder="菜单描述" class="layui-textarea" style="width: 50%;">{$DataStr['describe']}</textarea>
+            </div>
+        </div>
+         <div class="layui-form-item" style="width: 300px;">
+          <label class="layui-form-label">选择分类</label>
+          <div class="layui-input-block">
+            <select disabled="disabled" name="class_id" lay-filter="aihao">
+              <option value="0">==请选择==</option>
+              {foreach name="DataClass" item="v"}
+                <option value="{$v.id}" {if $v.id == $DataStr['class_id']} selected {/if}> {if $v.pid eq 0}{else}{if $v.lvl eq 2}　├{else}　　├{/if}{/if}{$v.class_name}</option>
+              {/foreach}
+            </select>
+          </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">难易度</label>
+            <div class="layui-input-block">
+              <span class="layui-form-label">{$DataStr['complexity']}</span>
+              <!-- <input disabled="" type="radio" name="complexity" value="一般" title="一般" {if $DataStr['complexity'] eq '一般'} checked="" {/if}>
+              <input disabled="" type="radio" name="complexity" value="较易" {if $DataStr['complexity'] eq '较易'} checked="" {/if} title="较易">
+              <input disabled="" type="radio" name="complexity" value="较难" {if $DataStr['complexity'] eq '较难'} checked="" {/if} title="较难"> -->
+            </div>
+        </div>
+
+        <div class="layui-form-item" style="width:300px;">
+            <label class="layui-form-label">烹饪时间</label>
+            <div class="layui-input-block">
+              <select disabled="disabled" name="handle_time" lay-filter="aihao">
+                <option value="未选择" {if $DataStr['handle_time'] eq "未选择"}selected{/if}>制作时间</option>
+                <option value="10分钟以内" {if $DataStr['handle_time'] eq "10分钟以内"}selected{/if}>10分钟以内</option>
+                <option value="10-20分钟" {if $DataStr['handle_time'] eq "10-20分钟"}selected{/if}>10-20分钟</option>
+                <option value="30分钟-1小时" {if $DataStr['handle_time'] eq "30分钟-1小时"}>30分钟-1小时</option>
+                <option value="1-2小时" {if $DataStr['handle_time'] eq "1-2小时"}selected{/if}>1-2小时</option>
+                <option value="2小时以上" {if $DataStr['handle_time'] eq "2小时以上"}selected{/if}>2小时以上</option>
+              </select>
+            </div>
+        </div>
+
+         <div class="GetAnchor">
+            <div class="layui-form-item">
+              <label class="layui-form-label">食材清单</label>
+                <button class="layui-btn layui-btn-disabled" type="button" style="">
+                    <i class="layui-icon">&#xe608;</i> 新增一行
+                </button>
+            </div>
+            {foreach name="$DataStr['inventory']" item="v"}
+            <div class="layui-form-item getDIv" style="margin:10px 0 0 110px;width:800px;">
+              <div class="layui-input-inline">
+                  <input readonly class="layui-input" type="text" value="{$v.food_name}" name="food_name" placeholder="食材名称--例：花生"  lay-verify="m_number">
+              </div>
+              <div class="layui-input-inline">
+                  <input readonly class="layui-input" type="text" value="{$v.food_how}" name="food_how" placeholder="食材量--例如：50g"  lay-verify="m_name">
+              </div>
+              <button type="button" style="width:35px;height: 38px;" class="layui-btn layui-btn-disabled layui-btn-small" ><span style="font-size:20px;">-</span></button>
+            </div>
+            {/foreach}
+        </div>
+        <div class="layui-form-item layui-form-text" style="margin-top: 15px;">
+            <label class="layui-form-label">操作步骤</label>
+            <div class="layui-input-block">
+                <textarea name="step" readonly="readonly" id="seo_description"  placeholder="操作步骤" class="layui-textarea" style="width: 50%;height:300px;">{$DataStr['step']}</textarea>
+                <div class="layui-form-mid layui-word-aux">完成一步按回车输入下一步操作</div>
+            </div>
+        </div>
+        <div class="site-demo-button layui-form-item">
+            <label class="layui-form-label">图片步骤</label>
+
+              <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;margin-left:110px;width:750px;">
+                预览图：
+                <div class="layui-upload-list" id="demo2">
+                  {foreach name="$DataStr['thumbnail']" item="v"}
+                    <img src="/upload/uploads/20170818/20170818122729817067.jpg" width="100" alt="log" class="layui-upload-img">
+                  {/foreach}
+                </div>
+             </blockquote>
+        </div>
+
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">小窍门</label>
+            <div class="layui-input-block">
+                <textarea name="tip" readonly="readonly" id="seo_description"  placeholder="小窍门" class="layui-textarea" style="width: 50%;">{$DataStr['tip']}</textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+            {if $DataStr['audit_start'] == 0 || $DataStr['audit_start'] == 2}
+                <a class="layui-btn layui-btn-small do-action" style="width:100px;height:40px;line-height: 40px;" id="adopt-role">通 过</a>
+                <a class="layui-btn layui-btn-small do-action" style="width:100px;height:40px;line-height: 40px;" id="reject-role">驳 回</a>
+            {else/}
+                <a class="layui-btn layui-btn-small do-action" style="width:100px;height:40px;line-height: 40px;" id="reject-role">重新 驳回</a>
+            {/if}
+            <a class="layui-btn layui-btn-small do-action" style="height:40px;line-height: 40px;" data-type="doGoBack" data-href=""><i class="fa fa-mail-reply"></i>返回上一页</a>
+            </div>
+        </div>
+    </form>
+
+</div>
+<div id="demo" class="demo"></div>
+
+{include file="public/footer"}
+<script>
+    var imgUrl;
+    layui.use(['form','common','upload'], function(){
+    var $ = layui.jquery
+            ,common=layui.common
+            ,form = layui.form();
+
+         layui.upload({
+            url: '' //上传接口
+            ,success: function(res){ //上传成功后的回调
+              console.log(res)
+            }
+          });
+
+        /**通过提交事件*/
+        $("#adopt-role").click(function(){
+            var id = $("input[name='c_id']").val();
+            var url = "{:url('greens_adopt')}";
+            $.get(url,{id:id},function(data){
+                if (data.code == 1) {
+                    // location.href = rturl;
+                    common.layerAlertS(data.msg, '提示');
+                    window.location.href = "{:url('greens_list')}";
+                }
+                else
+                {
+                    common.layerAlertE(data.msg, '提示');
+                }
+            },'json')
+        })
+
+        /**驳回提交事件*/
+        $("#reject-role").click(function(){
+            var id = $("input[name='c_id']").val();
+            var url = "{:url('greens_reject')}";
+            $.get(url,{id:id},function(data){
+                if (data.code == 1) {
+                    // location.href = rturl;
+                    common.layerAlertS(data.msg, '提示');
+                    window.location.href = "{:url('greens_list')}";
+                }
+                else
+                {
+                    common.layerAlertE(data.msg, '提示');
+                }
+            },'json')
+        })
+    });
+</script>

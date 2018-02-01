@@ -1,0 +1,261 @@
+{include file="public/header"/}
+<style>
+    .layui-form-switch {
+        padding-left: 0px;
+        transition: .1s linear;
+    }
+    .layui-table tr th{text-align: center;}
+    .layui-table tr td{text-align: center;}
+</style>
+<div class="main-wrap">
+    <blockquote class="layui-elem-quote fhui-admin-main_hd">
+        <h2>角色列表</h2>
+    </blockquote>
+    <div class="y-role">
+        <!--工具栏-->
+        <div id="floatHead" class="toolbar-wrap">
+            <div class="toolbar">
+                <div class="box-wrap">
+                    <a class="menu-btn"></a>
+                    <div class="l-list">
+                        <a href="javascript:;" class="layui-btn layui-btn-small do-action" data-type="doAdd" data-href="{:url('role/roleadd')}"><i class="fa fa-plus"></i>添加角色</a>
+
+                        <a class="layui-btn layui-btn-small do-action" data-type="doRefresh" data-href=""><i class="fa fa-refresh fa-spin"></i>刷新</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--/工具栏-->
+        <!--文字列表-->
+        <div class="fhui-admin-table-container">
+
+            <table class="layui-table">
+                <colgroup>
+                    <col width="5%">
+                    <col width="8%">
+                    <col width="5%">
+
+                    <col width="12%">
+                    <col width="12%">
+                    <col width="20%">
+                </colgroup>
+                <thead>
+                <tr>
+
+                    <th>id </th>
+                    <th>角色名称</th>
+                    <th>状态</th>
+                    <th>添加时间</th>
+                    <th>更新时间</th>
+                    <th>操作</th>
+
+                </tr>
+                </thead>
+                <script id="arlist" type="text/html">
+                    {{# for(var i=0;i<d.length;i++){  }}
+                    <tr class="long-td">
+
+                        <td>{{d[i].id}}</td>
+                        <td>{{d[i].title}}</td>
+                        <td>
+                            {{# if(d[i].status==1){ }}
+                            <a href="javascript:;" class="change_status"  data-id="{{d[i].id}}">
+                                <div class="layui-unselect layui-form-switch layui-form-onswitch"><i></i></div>
+
+                            </a>
+                            {{# }else{ }}
+                            <a href="javascript:;" class="change_status" data-id="{{d[i].id}}">
+
+                                <div class="layui-unselect layui-form-switch"><i></i></div>
+                            </a>
+                            {{# } }}
+                        </td>
+                        <td>{{d[i].create_time}}</td>
+
+
+                        <td>{{d[i].update_time}}</td>
+
+
+                        <td>
+
+                            <a  class="layui-btn layui-btn-small do-action" onclick="giveQx({{d[i].id}})" >
+                                <i class="icon-edit  fa fa-pencil-square-o"></i>分配权限
+                            </a>
+                            <a  class="layui-btn layui-btn-small do-action" data-type="doEdit" data-href="{:url('roleEdit')}" data-id="{{d[i].id}}">
+                                <i class="icon-edit  fa fa-pencil-square-o"></i>编辑
+                            </a>
+                            <a class="layui-btn layui-btn-small do-action" data-type="doDelOne" data-href="{:url('roleDel')}" data-id="{{d[i].id}}">
+                                <i class="icon-edit  fa fa-pencil-square-o"></i>删除
+                            </a>
+                        </td>
+                    </tr>
+                    {{# } }}
+                </script>
+                <tbody id="article_list">
+
+                </tbody>
+            </table>
+
+        </div>
+        <div id="AjaxPage" style="margin-top: -57px;float: right;"></div>
+        <div style="float: right;margin-top: -9px;margin-right: 13px;">
+            共{$count}条数据，<span id="allpage"></span>
+        </div>
+    </div>
+</div>
+<!-- 角色分配 -->
+<div class="zTreeDemoBackground left" style="display: none" id="role">
+    <input type="hidden" id="nodeid" value="">
+    <div class="form-group">
+        <div class="col-sm-5 col-sm-offset-2">
+            <ul id="treeType" class="ztree"></ul>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-4 col-sm-offset-4" style="margin-bottom: 15px">
+            <input type="button" value="确认分配" class="btn btn-primary" id="postform"/>
+        </div>
+    </div>
+</div>
+{include file="public/footer"}
+<script src="__js__/jquery.min.js?v=2.1.4"></script>
+<link rel="stylesheet" href="__js__/zTree/zTreeStyle.css" type="text/css">
+<script type="text/javascript" src="__js__/zTree/jquery.ztree.core-3.5.js"></script>
+<script type="text/javascript" src="__js__/zTree/jquery.ztree.excheck-3.5.js"></script>
+<script type="text/javascript" src="__js__/zTree/jquery.ztree.exedit-3.5.js"></script>
+
+<script type="text/javascript">
+    zNodes = '';
+    var index = '';
+    var index2 = '';
+    //分配权限
+    function giveQx(id){
+        $("#nodeid").val(id);
+        //加载层
+        index2 = layer.load(0, {shade: false}); //0代表加载的风格，支持0-2
+        //获取权限信息
+        $.getJSON('./giveAccess', {'type' : 'get', 'id' : id}, function(res){
+            layer.close(index2);
+            if(res.code == 1){
+                zNodes = JSON.parse(res.data);  //将字符串转换成obj
+
+                //页面层
+                index = layer.open({
+                    type: 1,
+                    area:['350px', '600px'],
+                    title:'权限分配',
+                    skin: 'layui-layer-demo', //加上边框
+                    content: $('#role')
+                });
+                //设置位置
+                layer.style(index, {
+                    top: '150px'
+                });
+
+                //设置zetree
+                var setting = {
+                    check:{
+                        enable:true
+                    },
+                    data: {
+                        simpleData: {
+                            enable: true
+                        }
+                    }
+                };
+
+                $.fn.zTree.init($("#treeType"), setting, zNodes);
+                var zTree = $.fn.zTree.getZTreeObj("treeType");
+                zTree.expandAll(true);
+
+            }else{
+                layer.alert(res.msg);
+            }
+
+        });
+    }
+
+    //确认分配权限
+    $("#postform").click(function(){
+        var zTree = $.fn.zTree.getZTreeObj("treeType");
+        var nodes = zTree.getCheckedNodes(true);
+        var NodeString = '';
+        $.each(nodes, function (n, value) {
+            if(n>0){
+                NodeString += ',';
+            }
+            NodeString += value.id;
+        });
+
+        var id = $("#nodeid").val();
+        //写入库
+        $.post('./giveAccess', {'type' : 'give', 'id' : id, 'rule' : NodeString}, function(res){
+            layer.close(index);
+            if(res.code == 1){
+                layer.msg(res.msg,{icon:1,time:1500,shade: 0.1}, function(){
+
+                });
+            }else{
+                layer.msg(res.msg);
+            }
+
+        }, 'json')
+    })
+
+
+    var laytpl,laypage,layer;
+    var url='{:url("role/index")}';
+    var allpages='{$allpage}';
+    layui.use(['layer', 'laypage','common', 'icheck','laytpl'], function () {
+        var $ = layui.jquery
+
+                , common = layui.common;
+        layer = layui.layer
+        laytpl =layui.laytpl;
+        laypage = layui.laypage;
+
+        common.Ajaxpage();
+
+        //加载单选框样式
+        $(("[type='checkbox']")).iCheck({
+            checkboxClass: 'icheckbox_square-green',
+
+        });
+        $(document).on('click','.change_status', function () {
+            var id=$(this).attr('data-id');
+            var obs=$(this);
+            $.ajax({
+                url: '{:url("role_state")}',
+                dataType: "json",
+                data:{'id':id},
+                type: "POST",
+                success: function(data){
+
+
+                    if(data.code == 1){
+                        obs.find('div').removeClass('layui-form-onswitch');
+                        layer.msg(data.msg,{icon:2,time:1500,shade: 0.1,});
+                    }else{
+                        obs.find('div').addClass('layui-form-onswitch');
+                        layer.msg(data.msg,{icon:1,time:1500,shade: 0.1,});
+                    }
+                },
+                error:function(ajaxobj)
+                {
+                    if(ajaxobj.responseText!='')
+                        alert(ajaxobj.responseText);
+                }
+            });
+
+        });
+
+        //全选
+        $(document).on('ifChanged','.selected-all', function (event) {
+            // alert(1);
+            var $input = $('.layui-table tbody tr td').find('input');
+            $input.iCheck(event.currentTarget.checked ? 'check' : 'uncheck');
+        });
+
+    });
+
+</script>

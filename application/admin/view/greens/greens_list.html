@@ -1,0 +1,259 @@
+{include file="public/header"/}
+<style>
+    .layui-form-switch {
+        padding-left: 0px;
+        transition: .1s linear;
+    }
+    .layui-table tr th{text-align: center;}
+    .layui-table tr td{text-align: center;}
+</style>
+<div class="main-wrap">
+    <blockquote class="layui-elem-quote fhui-admin-main_hd">
+        <h2>菜单列表</h2>
+    </blockquote>
+    <div class="y-role">
+        <!--工具栏-->
+        <div id="floatHead" class="toolbar-wrap">
+            <div class="toolbar">
+                <div class="box-wrap">
+                    <a class="menu-btn"></a>
+                    <div class="l-list">
+                        <a href="javascript:;" class="layui-btn layui-btn-small do-action" data-type="doAdd" data-href="{:url('greens_add')}"><i class="fa fa-plus"></i>添加菜单</a>
+                        <!-- <a class="layui-btn layui-btn-small do-action" data-type="doDelete" data-href="{:url('del_user')}"><i class="fa fa-trash-o"></i>删除</a> -->
+                        <a class="layui-btn layui-btn-small do-action" data-type="doRefresh" data-href=""><i class="fa fa-refresh fa-spin"></i>刷新</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--/工具栏-->
+        <!--文字列表-->
+        <div class="fhui-admin-table-container">
+
+            <table class="layui-table">
+                <!-- <colgroup>
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="8%">
+                    <col width="8%">
+                    <col width="10%">
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="15%">
+                    <col width="8%">
+                    <col width="20%">
+
+                </colgroup> -->
+                <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" class="selected-all i-checks" id="selected-all">
+                    </th>
+                    <th>菜单名称</th>
+                    <th>作者</th>
+                    <th>图片</th>
+                    <th>描述</th>
+                    <th>发布时间</th>
+                    <th>今日推荐</th>
+                    <th>点赞量</th>
+                    <th>收藏量</th>
+                    <th>审核状态</th>
+                    <th>发布状态</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <script id="arlist" type="text/html">
+                    {{# for(var i=0;i<d.length;i++){ }}
+                        <tr>
+                            <td>{{d[i].id}}</td>
+                            <td>{{d[i].name}}</td>
+                            {{# if(d[i].truename == 0){ }}
+                              <td>{{d[i].nickname}}</td>
+                            {{# }else{ }}
+                              <td>{{d[i].truename}}</td>
+                            {{# } }}
+                            <td><img src="/FlowProject/Food_test/public{{d[i].img}}" alt="" width="100" height="80"></td>
+                            <td>{{d[i].describe}}</td>
+                            <td>{{d[i].time}}</td>
+                            <td>
+                            {{# if(d[i].audit_start == 2 || d[i].audit_start == 0){ }}
+                                <a href="javascript:;" data-id="{{d[i].id}}">
+                                    <div style="cursor:not-allowed;" class="layui-unselect layui-form-switch"><i></i></div>
+                                </a>
+                            {{# }else{ }}
+                                {{# if(d[i].recommend == 1){ }}
+                                    <a href="javascript:;" class="recommend_status"  data-id="{{d[i].id}}">
+                                        <div class="layui-unselect layui-form-switch layui-form-onswitch"><i></i></div>
+                                    </a>
+                                    {{# }else{ }}
+                                    <a href="javascript:;" class="recommend_status" data-id="{{d[i].id}}">
+                                        <div class="layui-unselect layui-form-switch"><i></i></div>
+                                    </a>
+                                {{# } }}
+                            {{# } }}
+                            </td>
+                            <td>{{d[i].like}}</td>
+                            <td>{{d[i].collect}}</td>
+                            <td>
+                                {{# if(d[i].audit_start == 0){ }}
+                                    <font color="red">待审核</font>
+                                {{# }else if(d[i].audit_start == 2){ }}
+                                    <font color="#1AA094">已驳回</font>
+                                {{# }else{ }}
+                                    已通过
+                                {{# } }}
+                            </td>
+                            <td align="center">
+                            {{# if(d[i].audit_start == 2 || d[i].audit_start == 0){ }}
+                                <a href="javascript:;" data-id="{{d[i].id}}">
+                                    <div style="cursor:not-allowed;" class="layui-unselect layui-form-switch"><i></i></div>
+                                </a>
+                            {{# }else{ }}
+                                {{# if(d[i].status == 1){ }}
+                                    <a href="javascript:;" class="change_status"  data-id="{{d[i].id}}">
+                                        <div class="layui-unselect layui-form-switch layui-form-onswitch"><i></i></div>
+                                    </a>
+                                    {{# }else{ }}
+                                    <a href="javascript:;" class="change_status" data-id="{{d[i].id}}">
+                                        <div class="layui-unselect layui-form-switch"><i></i></div>
+                                    </a>
+                                {{# } }}
+                            {{# } }}
+                            </td>
+                            <td align="center">
+                                <a class="layui-btn layui-btn-small do-action" data-type="doEdit" data-href="{:url('greens_audit')}" data-id="{{d[i].id}}"><i class="icon-edit  fa fa-pencil-square-o"></i>查看</a>
+                                <a class="layui-btn layui-btn-small do-action" data-type="doEdit" data-href="{:url('greens_update')}" data-id="{{d[i].id}}"><i class="icon-edit  fa fa-pencil-square-o"></i>编辑</a>
+                                <a class="layui-btn layui-btn-small do-action" data-type="doDelOne" data-href="{:url('foodDel')}" data-id="{{d[i].id}}"><i class="icon-edit  fa fa-pencil-square-o"></i>删除</a>
+                            </td>
+                        </tr>
+                    {{# } }}
+                </script>
+                <tbody id="article_list"></tbody>
+                </tbody>
+            </table>
+
+        </div>
+        <div id="AjaxPage" style="margin-top: -57px;float: right;"></div>
+        <div style="float: right;margin-top: -9px;margin-right: 13px;">
+            共{$count}条数据，<span id="allpage"></span>
+        </div>
+    </div>
+</div>
+
+{include file="public/footer"}
+<script>
+    /**
+     * [user_state 文章状态]
+     * @param  {[type]} val [description]
+     * @Author[jonny 980218641@qq.com]
+     */
+
+    var laytpl,laypage;
+    var url='{:url("greens_list")}';
+    var allpages='{$allpage}';
+    layui.use(['layer', 'laypage','common', 'icheck','laytpl','form'], function () {
+          var $ = layui.jquery
+                , layer = layui.layer
+                , common = layui.common;
+        laytpl =layui.laytpl;
+        laypage = layui.laypage;
+        var form = layui.form();
+
+        common.Ajaxpage();
+
+        //加载单选框样式
+        $(("[type='checkbox']")).iCheck({
+            checkboxClass: 'icheckbox_square-green',
+
+        });
+
+        /*$(".i-checks").iCheck({
+            checkboxClass:"icheckbox_square-green",radioClass:"iradio_square-green",
+        });*/
+
+       /* $(document).('iCheck',function(){
+            checkboxClass:"icheckbox_square-green",radioClass:"iradio_square-green",
+        });*/
+
+        //发布状态修改
+        $(document).on('click','.change_status', function () {
+            var id=$(this).attr('data-id');
+            var obs=$(this);
+            $.ajax({
+                url: '{:url("food_state")}',
+                dataType: "json",
+                data:{'id':id},
+                type: "POST",
+                success: function(data){
+                    if(data.code == 1){
+                        obs.find('div').removeClass('layui-form-onswitch');
+                        layer.msg(data.msg,{icon:2,time:1500,shade: 0.1,});
+                    }else{
+                        obs.find('div').addClass('layui-form-onswitch');
+                        layer.msg(data.msg,{icon:1,time:1500,shade: 0.1,});
+                    }
+                },
+                error:function(ajaxobj)
+                {
+                    if(ajaxobj.responseText!='')
+                        alert(ajaxobj.responseText);
+                }
+            });
+        });
+
+        //今日推荐修改
+        $(document).on('click','.recommend_status', function () {
+            var id=$(this).attr('data-id');
+            var obs=$(this);
+            $.ajax({
+                url: '{:url("recommend_status")}',
+                dataType: "json",
+                data:{'id':id},
+                type: "POST",
+                success: function(data){
+
+
+                    if(data.code == 1){
+                        obs.find('div').removeClass('layui-form-onswitch');
+                        layer.msg(data.msg,{icon:2,time:1500,shade: 0.1,});
+                    }else{
+                        obs.find('div').addClass('layui-form-onswitch');
+                        layer.msg(data.msg,{icon:1,time:1500,shade: 0.1,});
+                    }
+                },
+                error:function(ajaxobj)
+                {
+                    if(ajaxobj.responseText!='')
+                        alert(ajaxobj.responseText);
+                }
+            });
+        });
+        /*  //表格行点击勾选
+         $('.layui-table tbody tr').on('click', function () {
+         var $this = $(this);
+         var $input = $this.children('td').eq(0).find('input');
+         $input.on('ifChecked', function (e) {
+         $this.css('background-color', '#EEEEEE');
+         });
+         $input.on('ifUnchecked', function (e) {
+         $this.removeAttr('style');
+         });
+         $input.iCheck('toggle');
+         }).find('input').each(function () {
+         var $this = $(this);
+         $this.on('ifChecked', function (e) {
+         $this.parents('tr').css('background-color', '#EEEEEE');
+         });
+         $this.on('ifUnchecked', function (e) {
+         $this.parents('tr').removeAttr('style');
+         });
+         });*/
+        //全选
+        $(document).on('ifChanged','.selected-all', function (event) {
+            // alert(1);
+            var $input = $('.layui-table tbody tr td').find('input');
+            $input.iCheck(event.currentTarget.checked ? 'check' : 'uncheck');
+        });
+
+    });
+</script>

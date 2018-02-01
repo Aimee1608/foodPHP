@@ -1,0 +1,96 @@
+{include file="public/header"}
+<div class="main-wrap">
+    <blockquote class="layui-elem-quote fhui-admin-main_hd">
+        <h2>添加会员等级</h2>
+    </blockquote>
+    <form class="layui-form" action="add_article">
+        <div class="layui-form-item">
+            <label class="layui-form-label">等级名称</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="leval_name" placeholder="会员等级名称"  lay-verify="title">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">等级积分</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="leval_points" placeholder="会员等级名称"  lay-verify="number">
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-inline">
+                <input type="checkbox" checked="" name="status" lay-skin="switch" lay-filter="switchTest" title="开关"><div class="layui-unselect layui-form-switch layui-form-onswitch"><i></i></div>
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit="" lay-filter="add-role" data-href="{:url('add_leval')}">立即提交</button>
+                <a class="layui-btn layui-btn-small do-action" data-type="doGoBack" data-href=""><i class="fa fa-mail-reply"></i>返回上一页</a>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+
+{include file="public/footer"}
+<script>
+    layui.use(['form','common'], function(){
+        var $ = layui.jquery
+                ,common=layui.common
+                ,form = layui.form();
+        //自定义验证规则
+        form.verify({
+            title:function(value){
+                if(value == ""){
+                    return '等级名称不能为空';
+                }
+            }
+
+        });
+
+        //监听提交
+        form.on('submit(add-role)', function(data){
+            var sub=true;
+            var url=$(this).data('href');
+            if(url){
+                if(sub){
+                    $.ajax({
+                        url: url,
+                        type: 'post',
+                        dataType: 'json',
+                        data: data.field,
+                        success: function (data) {
+                            if (data.code == 1) {
+                                // location.href = rturl;
+                                common.layerAlertS(data.msg, '提示');
+                                window.location.href="{:url('article/index_cate')}";
+                            }
+                            else {
+                                common.layerAlertE(data.msg, '提示');
+                            }
+                        },
+                        beforeSend: function () {
+                            //    // 一般是禁用按钮等防止用户重复提交
+                            $(data.elem).attr("disabled", "true").text("提交中...");
+                        },
+                        //complete: function () {
+                        //    $(sbbtn).removeAttr("disabled");
+                        //},
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            common.layerAlertE(textStatus, '提示');
+                        }
+                    });
+                }
+            }else{
+                common.layerAlertE('链接错误！', '提示');
+            }
+
+            return false;
+        });
+    });
+</script>

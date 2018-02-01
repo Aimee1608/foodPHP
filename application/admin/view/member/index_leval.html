@@ -1,0 +1,126 @@
+{include file="public/header" /}
+<style>
+    .layui-form-switch {
+        padding-left: 0px;
+        transition: .1s linear;
+    }
+
+</style>
+<div class="main-wrap">
+    <blockquote class="layui-elem-quote fhui-admin-main_hd">
+        <h2>会员等级列表</h2>
+    </blockquote>
+
+    <div class="y-role">
+        <!--工具栏-->
+        <div id="floatHead" class="toolbar-wrap">
+            <div class="toolbar">
+                <div class="box-wrap">
+                    <a class="menu-btn"></a>
+                    <div class="l-list">
+                        <a class="layui-btn layui-btn-small do-action" data-type="doAdd" data-href="{:url('add_leval')}"><i class="fa fa-plus"></i>新增</a>
+
+                        <a class="layui-btn layui-btn-small do-action" data-type="doRefresh" data-href=""><i class="fa fa-refresh fa-spin"></i>刷新</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--/工具栏-->
+        <!--文字列表-->
+        <div class="fhui-admin-table-container">
+            <form action="/_Admin/Nav_list" class="form-horizontal" id="formrec" method="post" role="form">
+                <table class="layui-table" lay-skin="line">
+                    <colgroup>
+
+                        <col width="5%">
+
+                        <col width="10%">
+                        <col width="8%">
+                        <col width="8%">
+
+                        <col width="20%">
+                    </colgroup>
+                    <thead>
+                    <tr>
+
+                        <th>ID</th>
+                        <th>会员等级</th>
+                        <th>等级积分</th>
+
+                        <th>状态</th>
+
+
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {foreach name="list" item="v"}
+                    <tr class="long-td">
+                        <td>{$v.id}</td>
+                        <td>{$v.leval_name}</td>
+                        <td>{$v.leval_points}</td>
+                        <td>
+
+                            {if condition="$v.status eq 1"}
+
+                            <a href="javascript:;" class="change_status" data-id="{$v.id}"> <div class="layui-unselect layui-form-switch layui-form-onswitch"><i></i></div> </a>
+                            {else/}
+
+                            <a href="javascript:;" class="change_status" data-id="{$v.id}"> <div class="layui-unselect layui-form-switch"><i></i></div> </a>
+                            {/if}
+                        </td>
+
+                        <td>
+                            <a class="layui-btn layui-btn-small do-action" data-type="doEdit" data-href="{:url('edit_leval',['id'=>$v.id])}"><i class="icon-edit  fa fa-pencil-square-o"></i>编辑</a>
+                            <a class="layui-btn layui-btn-small do-action" data-type="doDelOne" data-href="{:url('del_leval')}" data-id="{$v.id}"><i class="icon-edit  fa fa-pencil-square-o"></i>删除</a>
+                        </td>
+                    </tr>
+
+
+                    {/foreach}
+
+
+                    </tbody>
+                </table>
+            </form>
+        </div>
+
+    </div>
+</div>
+{include file="public/footer"}
+<script>
+
+    layui.use(['layer','common'], function () {
+        var $ = layui.jquery
+                , layer = layui.layer;
+
+        $(document).on('click','.change_status', function () {
+            var id=$(this).attr('data-id');
+
+            var obs=$(this);
+            $.ajax({
+                url: '{:url("state_leval")}',
+                dataType: "json",
+                data:{'id':id},
+                type: "POST",
+                success: function(data){
+
+
+                    if(data.code == 1){
+                        obs.find('div').removeClass('layui-form-onswitch');
+                        layer.msg(data.msg,{icon:2,time:1500,shade: 0.1,});
+                    }else{
+                        obs.find('div').addClass('layui-form-onswitch');
+                        layer.msg(data.msg,{icon:1,time:1500,shade: 0.1,});
+                    }
+                },
+                error:function(ajaxobj)
+                {
+                    if(ajaxobj.responseText!='')
+                        alert(ajaxobj.responseText);
+                }
+            });
+
+        });
+    });
+</script>

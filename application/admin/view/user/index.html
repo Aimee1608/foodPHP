@@ -1,0 +1,176 @@
+{include file="public/header"/}
+<style>
+    .layui-form-switch {
+        padding-left: 0px;
+        transition: .1s linear;
+    }
+    .layui-table tr th{text-align: center;}
+    .layui-table tr td{text-align: center;}
+</style>
+<div class="main-wrap">
+    <blockquote class="layui-elem-quote fhui-admin-main_hd">
+        <h2>用户列表</h2>
+    </blockquote>
+    <div class="y-role">
+        <!--工具栏-->
+        <div id="floatHead" class="toolbar-wrap">
+            <div class="toolbar">
+                <div class="box-wrap">
+                    <a class="menu-btn"></a>
+                    <div class="l-list">
+                        <a href="javascript:;" class="layui-btn layui-btn-small do-action" data-type="doAdd" data-href="{:url('userAdd')}"><i class="fa fa-plus"></i>添加用户</a>
+
+                        <a class="layui-btn layui-btn-small do-action" data-type="doRefresh" data-href=""><i class="fa fa-refresh fa-spin"></i>刷新</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--/工具栏-->
+        <!--文字列表-->
+        <div class="fhui-admin-table-container">
+
+            <table class="layui-table">
+                <colgroup>
+                    <col width="5%">
+                    <col width="8%">
+                    <col width="5%">
+
+                    <col width="5%">
+                    <col width="10%">
+                    <col width="12%">
+                    <col width="8%">
+                    <col width="5%">
+                    <col width="15%">
+                </colgroup>
+                <thead>
+                <tr>
+
+                    <th>ID</th>
+                    <th>管理员名称</th>
+                    <th>管理员角色</th>
+                    <th>登录次数</th>
+                    <th>上次登录ip</th>
+                    <th>上次登录时间</th>
+                    <th>真实姓名</th>
+                    <th>状态</th>
+                    <th>操作</th>
+
+                </tr>
+                </thead>
+
+                <script id="arlist" type="text/html">
+                    {{# for(var i=0;i<d.length;i++){  }}
+
+                    <tr class="long-td">
+                        <td>{{d[i].id}}</td>
+                        <td>{{d[i].username}}</td>
+                        <td>{{d[i].title}}</td>
+                        <td>{{d[i].loginnum}}</td>
+                        <td>{{d[i].last_login_ip}}</td>
+                        <td>{{d[i].last_login_time}}</td>
+                        <td>{{d[i].real_name}}</td>
+                        <td>
+                            {{# if(d[i].id!==1){ }}
+                                {{# if(d[i].status==1){ }}
+                                <a href="javascript:;" class="change_status"  data-id="{{d[i].id}}">
+                                    <div class="layui-unselect layui-form-switch layui-form-onswitch"><i></i></div>
+
+                                </a>
+                                {{# }else{ }}
+                                <a href="javascript:;" class="change_status" data-id="{{d[i].id}}">
+
+                                    <div class="layui-unselect layui-form-switch"><i></i></div>
+                                </a>
+                                {{# } }}
+                            {{# } }}
+                        </td>
+                        <td>
+                            {{# if(d[i].id!==1){ }}
+                                <a  class="layui-btn layui-btn-small do-action" data-type="doEdit" data-href="{:url('userEdit')}" data-id="{{d[i].id}}">
+                                    <i class="icon-edit  fa fa-pencil-square-o"></i>编辑
+                                </a>
+                                <a class="layui-btn layui-btn-small do-action" data-type="doDelOne" data-href="{:url('userDel')}" data-id="{{d[i].id}}">
+                                    <i class="icon-edit  fa fa-pencil-square-o"></i>删除
+                                </a>
+                            {{# } }}
+
+
+                        </td>
+                    </tr>
+                    {{# } }}
+                </script>
+                <tbody id="article_list"></tbody>
+            </table>
+
+        </div>
+        <div id="AjaxPage" style="margin-top: -57px;float: right;"></div>
+        <div style="float: right;margin-top: -9px;margin-right: 13px;">
+            共{$count}条数据，<span id="allpage"></span>
+        </div>
+    </div>
+</div>
+
+{include file="public/footer"}
+<script>
+    /**
+     * [user_state 文章状态]
+     * @param  {[type]} val [description]
+     * @Author[jonny 980218641@qq.com]
+     */
+
+    var laytpl,laypage;
+    var url='{:url("User/index")}';
+    var allpages='{$allpage}';
+    layui.use(['layer', 'laypage','common', 'icheck','laytpl'], function () {
+        var $ = layui.jquery
+                , layer = layui.layer
+                , common = layui.common;
+        laytpl =layui.laytpl;
+        laypage = layui.laypage;
+
+        common.Ajaxpage();
+
+        //加载单选框样式
+        $(("[type='checkbox']")).iCheck({
+            checkboxClass: 'icheckbox_square-green',
+
+        });
+
+        //改变状态
+        $(document).on('click','.change_status', function () {
+            var id=$(this).attr('data-id');
+            var obs=$(this);
+            $.ajax({
+                url: '{:url("user_state")}',
+                dataType: "json",
+                data:{'id':id},
+                type: "POST",
+                success: function(data){
+
+
+                    if(data.code == 1){
+                        obs.find('div').removeClass('layui-form-onswitch');
+                        layer.msg(data.msg,{icon:2,time:1500,shade: 0.1,});
+                    }else{
+                        obs.find('div').addClass('layui-form-onswitch');
+                        layer.msg(data.msg,{icon:1,time:1500,shade: 0.1,});
+                    }
+                },
+                error:function(ajaxobj)
+                {
+                    if(ajaxobj.responseText!='')
+                        alert(ajaxobj.responseText);
+                }
+            });
+
+        });
+
+        //全选
+        $(document).on('ifChanged','.selected-all', function (event) {
+            // alert(1);
+            var $input = $('.layui-table tbody tr td').find('input');
+            $input.iCheck(event.currentTarget.checked ? 'check' : 'uncheck');
+        });
+
+    });
+</script>

@@ -1,0 +1,207 @@
+{include file="public/header"}
+<style>
+/*#default_img{margin-left:20px;}*/
+    .site-demo-upload,
+    .site-demo-upload img{width: 300px; height: 200px;}
+    .site-demo-upload{position: relative; background: #e2e2e2;}
+    .site-demo-upload .site-demo-upbar{position: absolute; top: 50%; left: 50%; margin: -18px 0 0 -56px;}
+    .site-demo-upload .layui-upload-button{background-color: rgba(0,0,0,.2); color: rgba(255,255,255,1);}
+    .upload-img{
+        margin-left: 108px;
+        margin-top: 10px;
+    }
+    .upload-img img{
+        margin-top: -30px;
+    }
+
+    .site-demo-upload-smail,
+    .site-demo-upload-smail img{width: 150px; height: 150px;}
+    .site-demo-upload-smail{position: relative; background: #e2e2e2;}
+    .site-demo-upload-smail .site-demo-upbar{position: absolute; top: 50%; left: 50%; margin: -18px 0 0 -56px;}
+    .site-demo-upload-smail .layui-upload-button{background-color: rgba(0,0,0,.2); color: rgba(255,255,255,1);}
+    .upload-img-smail{
+        margin-left: 108px;
+        margin-top: 10px;
+    }
+    .upload-img-smail img{
+        margin-top: -30px;
+    }
+</style>
+
+<div class="main-wrap">
+    <blockquote class="layui-elem-quote fhui-admin-main_hd">
+        <h2>添加焦点图</h2>
+    </blockquote>
+    <form class="layui-form" action="add_article">
+        <div class="layui-form-item">
+            <label class="layui-form-label">标题</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="title" placeholder="请输入焦点图标题"  lay-verify="title">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">链接地址</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="link_url" placeholder="请输入广告链接地址"  lay-verify="link_url">
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <div style="float: left;">
+                <label class="layui-form-label">焦点图片</label>
+                <div class="site-demo-upload upload-img">
+                    <img id="default_img" src="__img__/tong.jpg">
+                    <div class="site-demo-upbar">
+                            <input type="file" name="file" class="layui-upload-file" id="upload_ad_image">
+                            <input type="hidden" id="images" name="img" value="http://www.flows.com/Flow/public/statisc/img/tong.jpg">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">广告有效期</label>
+                <div class="layui-input-inline" style="width: 30%;">
+                    <input type="text" name="start_date" placeholder="开始时间" autocomplete="off" class="layui-input" id="start_time">
+                </div>
+                <div class="layui-form-mid">-</div>
+                <div class="layui-input-inline" style="width: 30%;">
+                    <input type="text" name="end_date" placeholder="结束时间" autocomplete="off" class="layui-input" id="end_time">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">排序</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="order_by" placeholder="排序"  lay-verify="number">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-inline">
+                <input type="checkbox" checked="" name="status" lay-skin="switch" lay-filter="switchTest" title="开关"><div class="layui-unselect layui-form-switch layui-form-onswitch"><i></i></div>
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit="" lay-filter="add-role" data-href="{:url('add_focus')}">立即提交</button>
+                <a class="layui-btn layui-btn-small do-action" data-type="doGoBack" data-href=""><i class="fa fa-mail-reply"></i>返回上一页</a>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+
+{include file="public/footer"}
+<script>
+    layui.use(['form','common','laydate','upload'], function(){
+        var $ = layui.jquery
+                ,common=layui.common
+                ,laydate = layui.laydate
+                ,form = layui.form();
+
+        var start = {
+            min: laydate.now()
+            ,max: '2099-06-16 23:59:59'
+            ,istoday: false
+            ,choose: function(datas){
+                end.min = datas; //开始日选好后，重置结束日的最小日期
+                end.start = datas //将结束日的初始值设定为开始日
+            }
+        };
+
+        var end = {
+            min: laydate.now()
+            ,max: '2099-06-16 23:59:59'
+            ,istoday: false
+            ,choose: function(datas){
+                start.max = datas; //结束日选好后，重置开始日的最大日期
+            }
+        };
+
+        document.getElementById('start_time').onclick = function(){
+            start.elem = this;
+            laydate(start);
+        }
+        document.getElementById('end_time').onclick = function(){
+            end.elem = this
+            laydate(end);
+        }
+        //自定义验证规则
+        form.verify({
+            title:function(value){
+                if(value == ""){
+                    return '等级名称不能为空';
+                }
+            }
+
+        });
+        //上传广告图片
+        layui.upload({
+            url: "{:url('Upload/uploadAdImage')}" //上传接口
+            ,before: function(input){
+                //返回的参数item，即为当前的input DOM对象
+                console.log('图片上传中');
+            }
+            ,title:'上传封面图'
+            ,elem: '#upload_ad_image' //指定原始元素，默认直接查找class="layui-upload-file"
+            ,method: 'post' //上传接口的http类型
+            ,ext: 'jpg|png|gif'
+            ,type:'images'
+            ,success: function(data){ //上传成功后的回调
+                //console.log(res)
+                if(data.status == 1){
+                    $("#images").val('/upload/testfile/' +data.image_name);
+                    $("#default_img").attr('src', '/upload/testfile/' + data.image_name).show();
+                }else{
+                    alert(data.error_info);
+                }
+
+            }
+        });
+        
+        //监听提交
+        form.on('submit(add-role)', function(data){
+            var sub=true;
+            var url=$(this).data('href');
+            if(url){
+                if(sub){
+                    $.ajax({
+                        url: url,
+                        type: 'post',
+                        dataType: 'json',
+                        data: data.field,
+                        success: function (data) {
+                            if (data.code == 1) {
+                                // location.href = rturl;
+                                common.layerAlertS(data.msg, '提示');
+                                window.location.href="{:url('ad/focus_map')}";
+                            }
+                            else {
+                                common.layerAlertE(data.msg, '提示');
+                            }
+                        },
+                        beforeSend: function () {
+                            //    // 一般是禁用按钮等防止用户重复提交
+                            $(data.elem).attr("disabled", "true").text("提交中...");
+                        },
+                        //complete: function () {
+                        //    $(sbbtn).removeAttr("disabled");
+                        //},
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            common.layerAlertE(textStatus, '提示');
+                        }
+                    });
+                }
+            }else{
+                common.layerAlertE('链接错误！', '提示');
+            }
+
+            return false;
+        });
+    });
+</script>

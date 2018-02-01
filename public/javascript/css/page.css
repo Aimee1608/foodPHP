@@ -1,0 +1,21 @@
+/*分页样式*/
+.pagination li{float: left;}
+.list-page{width:600px;}
+.disabled span,
+.list-page a{
+	padding:5px 15px;
+	border:1px solid #ccc;
+	margin:0 3px;
+}
+.list-page a:hover{
+	background:#FFAC59;
+	border:1px solid #908f8f;
+}
+.list-page .active{
+	border:1px solid #ccc;
+	background:#FFAC59;
+	padding:5px 15px;
+	margin-top:-5px;
+}
+
+/*<div class="list-page">{$page}</div>*/

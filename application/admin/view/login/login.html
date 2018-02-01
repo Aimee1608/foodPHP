@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FlowAdmin后台登录</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <!-- load css -->
+    <link href="__lay__/css/layui.css" rel="stylesheet" />
+    <link rel="icon" href="__img__/titlg.png" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="__css__/login.css" media="all">
+
+    <!--极验验证需要引入的两个JS-->
+    <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+    <script src="http://static.geetest.com/static/tools/gt.js"></script>
+    <style>
+        .btn{
+            width: 100%;
+            height: 42px;
+            border: none;
+            font-size: 16px;
+            background: #FF5722;
+            color: #f8f8f8;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-canvs"></div>
+<form id="doLogin" name="doLogin" method="post" action="{:url('doLogin')}">
+    <div class="layui-layout layui-layout-login">
+        <h1>
+            <strong>FlowAdmin后台管理系统</strong>
+            <em>为你所爱，是你想要</em>
+        </h1>
+        <div class="layui-user-icon larry-login">
+            <input type="text" placeholder="账号" id="username" name="username" class="login_txtbx"/>
+        </div>
+        <div class="layui-pwd-icon larry-login">
+            <input type="password" placeholder="密码" class="login_txtbx" id="password" name="password"/>
+        </div>
+        {if condition="config('verify_type') eq 1"}
+        <div style="margin-bottom:70px">
+            <input type="text" class="form-control" placeholder="验证码" style="color:black;width:120px;float:left;margin:0px 0px;" name="code" id="code"/>
+            <img src="{:url('checkVerify')}" onclick="javascript:this.src='{:url('checkVerify')}?tm='+Math.random();" style="float:right;cursor: pointer"/>
+        </div>
+        {else/}
+        <div id="embed-captcha"></div>
+        <p id="wait" style="display:none;">正在加载验证码......</p>
+        {/if}
+
+
+        <div class="layui-submit larry-login">
+            <input type="submit" class="btn" value="立即登录"/>
+            <!--<button type="submit" class="btn btn-primary btn-block">登　录</button>-->
+        </div>
+        <div class="layui-login-text">
+
+            <p>赞助作者30即可获得整套源码，支付宝微信：15035574759 <a href="http://www.qinlinhui.cn" title="">welcome you</a></p>
+        </div>
+    </div>
+</form>
+<script src="__lay__/lay/dest/layui.all.js"></script>
+<script src="__js__/login.js"></script>
+<script src="__js__/jquery.form.js"></script>
+
+<script src="__js__/jparticle.jquery.js"></script>
+<script type="text/javascript">
+
+    $(function(){
+        $(".layui-canvs").jParticle({
+            background: "#141414",
+            color: "#E6E6E6"
+        });
+        //登录链接测试，使用时可删除
+        $(".submit_btn").click(function(){
+            location.href="index.html";
+        });
+    });
+    var handlerEmbed = function (captchaObj) {
+        $("#embed-submit").click(function (e) {
+            var validate = captchaObj.getValidate();
+            if (!validate) {
+                $("#notice")[0].className = "show";
+                setTimeout(function () {
+                    $("#notice")[0].className = "hide";
+                }, 2000);
+                e.preventDefault();
+            }
+        });
+        // 将验证码加到id为captcha的元素里
+        captchaObj.appendTo("#embed-captcha");
+        captchaObj.onReady(function () {
+            $("#wait")[0].className = "hide";
+        });
+        // 更多接口参考：http://www.geetest.com/install/sections/idx-client-sdk.html
+    };
+    $.ajax({
+        // 获取id，challenge，success（是否启用failback）
+        url: "{:url('login/getVerify',array('t'=>time()))}", // 加随机数防止缓存
+        type: "get",
+        dataType: "json",
+        success: function (data) {
+            // 使用initGeetest接口
+            // 参数1：配置参数
+            // 参数2：回调，回调的第一个参数验证码对象，之后可以使用它做appendTo之类的事件
+            initGeetest({
+                gt: data.gt,
+                challenge: data.challenge,
+                product: "float", // 产品形式，包括：float，embed，popup。注意只对PC版验证码有效
+                offline: !data.success // 表示用户后台检测极验服务器是否宕机，一般不需要关注
+            }, handlerEmbed);
+        }
+    });
+
+
+    $(function(){
+        $('#doLogin').ajaxForm({
+            beforeSubmit: checkForm, // 此方法主要是提交前执行的方法，根据需要设置
+            success: complete, // 这是提交后的方法
+            dataType: 'json'
+        });
+
+        function checkForm(){
+            if( '' == $.trim($('#username').val())){
+                var name=$("#username").val();
+                layer.msg('请输入登录用户名', {icon: 5,time:2000}, function(index){
+                    layer.close(index);
+                });
+                return false;
+            }
+
+            if( '' == $.trim($('#password').val())){
+                layer.msg('请输入登录密码', {icon: 5,time:2000}, function(index){
+                    layer.close(index);
+                });
+                return false;
+            }
+
+            $("button").removeClass('btn-primary').addClass('btn-danger').text("登录中...");
+        }
+
+
+        function complete(data){
+            if(data.code==1){
+                layer.msg(data.msg, {icon: 6,time:2000}, function(index){
+                    layer.close(index);
+                    window.location.href=data.data;
+                });
+            }else{
+                layer.msg(data.msg, {icon: 5,time:2000});
+                $("button").removeClass('btn-danger').addClass('btn-primary').text("登　录");
+                return false;
+            }
+
+        }
+
+    });
+
+</script>
+
+</body>
+</html>
+<!--<script>-->
+    <!--(function() {-->
+        <!--document.oncontextmenu = function(a) {-->
+            <!--layer.msg("欢迎你，赞助作者获取源码", {icon: 5,time:2000});-->
+            <!--return false-->
+        <!--};-->
+        <!--document.onclick = function() {-->
+            <!--$(c).fadeOut(100)-->
+        <!--}-->
+    <!--})();-->
+    <!--document.onkeydown = function(a) {-->
+        <!--var e = a || window.event || arguments.callee.caller.arguments[0];-->
+        <!--if ((e.keyCode === 123) || (e.ctrlKey) || (e.ctrlKey) && (e.keyCode === 85)) {-->
+            <!--return false-->
+        <!--}-->
+    <!--};-->
+<!--</script>-->

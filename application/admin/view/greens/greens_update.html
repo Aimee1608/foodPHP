@@ -1,0 +1,276 @@
+{include file="public/header"}
+<!-- 引用批量上传文件插件样式 -->
+    <link rel="stylesheet" href="__UPDATE__/control/css/zyUpload.css" type="text/css">
+
+    <script type="text/javascript" src="__UPDATE__/jquery-1.7.2.js"></script>
+    <!-- 引用核心层插件 -->
+    <script type="text/javascript" src="__UPDATE__/core/zyFile.js"></script>
+<style>
+    .site-demo-upload,
+    .site-demo-upload img{width: 200px; height: 200px; border-radius: 100%;}
+    .site-demo-upload{position: relative; background: #e2e2e2;}
+    .site-demo-upload .site-demo-upbar{position: absolute; top: 50%; left: 50%; margin: -18px 0 0 -56px;}
+    .site-demo-upload .layui-upload-button{background-color: rgba(0,0,0,.2); color: rgba(255,255,255,1);}
+    .upload-img{
+        margin-left: 95px;
+        margin-top: 10px;
+    }
+    .upload-img img{
+        margin-top: -38px;
+    }
+</style>
+<div class="main-wrap">
+    <blockquote class="layui-elem-quote fhui-admin-main_hd">
+        <h2>修改菜单</h2>
+    </blockquote>
+    <form class="layui-form" action="add_article">
+    <input type="hidden" name="zyfile" value="{$DataStr['thumbnail']}" style="width:1000px;"><!-- 图形步骤数据 -->
+    <input type="hidden" name="file_start" value="0"><!-- 点击上传图片步骤按钮 -->
+    <input type="hidden" name="c_id" value="{$c_id}"><!-- 菜单ID -->
+        <div class="layui-form-item">
+            <label class="layui-form-label">菜单名称</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" value="{$DataStr['name']}" type="text" name="name" placeholder="菜单名称"  lay-verify="name">
+            </div>
+        </div>
+         <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">封面图</label>
+            <div class="site-demo-upload upload-img">
+                <img id="default_img" src="/FlowProject/Food_test/public{$DataStr['img']}">
+                <div class="site-demo-upbar">
+                        <input type="file" name="file" class="layui-upload-file" id="upload_ad_image">
+                        <input type="hidden" id="images" name="img" value="{$DataStr['img']}">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">菜单描述</label>
+            <div class="layui-input-block">
+                <textarea name="describe" id="seo_description"  placeholder="菜单描述" class="layui-textarea" style="width: 50%;">{$DataStr['describe']}</textarea>
+            </div>
+        </div>
+         <div class="layui-form-item" style="width: 300px;">
+          <label class="layui-form-label">选择分类</label>
+          <div class="layui-input-block">
+            <select name="class_id" lay-filter="aihao">
+              <option value="0">==请选择==</option>
+              {foreach name="DataClass" item="v"}
+                <option value="{$v.id}" {if $v.id == $DataStr['class_id']} selected {/if}> {if $v.pid eq 0}{else}{if $v.lvl eq 2}　├{else}　　├{/if}{/if}{$v.class_name}</option>
+              {/foreach}
+            </select>
+          </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">难易度</label>
+            <div class="layui-input-block">
+              <input type="radio" name="complexity" value="一般" title="一般" {if $DataStr['complexity'] eq '一般'} checked="" {/if}>
+              <input type="radio" name="complexity" value="较易" {if $DataStr['complexity'] eq '较易'} checked="" {/if} title="较易">
+              <input type="radio" name="complexity" value="较难" {if $DataStr['complexity'] eq '较难'} checked="" {/if} title="较难">
+            </div>
+        </div>
+
+        <div class="layui-form-item" style="width:300px;">
+            <label class="layui-form-label">烹饪时间</label>
+            <div class="layui-input-block">
+              <select name="handle_time" lay-filter="aihao">
+                <option value="未选择" {if $DataStr['handle_time'] eq "未选择"}selected{/if}>制作时间</option>
+                <option value="10分钟以内" {if $DataStr['handle_time'] eq "10分钟以内"}selected{/if}>10分钟以内</option>
+                <option value="10-20分钟" {if $DataStr['handle_time'] eq "10-20分钟"}selected{/if}>10-20分钟</option>
+                <option value="30分钟-1小时" {if $DataStr['handle_time'] eq "30分钟-1小时"}>30分钟-1小时</option>
+                <option value="1-2小时" {if $DataStr['handle_time'] eq "1-2小时"}selected{/if}>1-2小时</option>
+                <option value="2小时以上" {if $DataStr['handle_time'] eq "2小时以上"}selected{/if}>2小时以上</option>
+              </select>
+            </div>
+        </div>
+
+         <div class="GetAnchor">
+            <div class="layui-form-item">
+              <label class="layui-form-label">食材清单</label>
+                <button class="layui-btn" type="button" id="GetAnchor" style="">
+                    <i class="layui-icon">&#xe608;</i> 新增一行
+                </button>
+            </div>
+            {foreach name="$DataStr['inventory']" item="v"}
+            <div class="layui-form-item getDIv" style="margin:10px 0 0 110px;width:800px;">
+              <div class="layui-input-inline">
+                  <input class="layui-input" type="text" value="{$v.food_name}" name="food_name" placeholder="食材名称--例：花生"  lay-verify="m_number">
+              </div>
+              <div class="layui-input-inline">
+                  <input class="layui-input" type="text" value="{$v.food_how}" name="food_how" placeholder="食材量--例如：50g"  lay-verify="m_name">
+              </div>
+              <button type="button" style="width:35px;height: 38px;" class="GetAnchorRemove layui-btn layui-btn-small" ><span style="font-size:20px;">-</span></button>
+            </div>
+            {/foreach}
+        </div>
+        <div class="layui-form-item layui-form-text" style="margin-top: 15px;">
+            <label class="layui-form-label">操作步骤</label>
+            <div class="layui-input-block">
+                <textarea name="step" id="seo_description"  placeholder="操作步骤" class="layui-textarea" style="width: 50%;">{$DataStr['step']}</textarea>
+                <div class="layui-form-mid layui-word-aux">完成一步按回车输入下一步操作</div>
+            </div>
+        </div>
+        <div class="site-demo-button layui-form-item">
+            <label class="layui-form-label">图片步骤</label>
+            <!-- <div id="demo" class="demo"></div> -->
+            <button data-method="setTop" style="float: left;" type="button" id="GetUpdate" class="layui-btn">重新上传图形步骤</button>
+            <div class="layui-form-mid layui-word-aux" style="float: left;margin-left:20px;color:#272822;">已经上传{$DataStr['thumbnailcount']}张图片</div>
+        </div>
+
+        <div class="site-demo-button layui-form-item" id="UpdateShow" style="display:none;">
+            <label class="layui-form-label">已上传图片</label>
+            <div id="ImgUrl" style="margin-left：100px;border:1px solid #F2F2F2;height:auto;float:left;width:540px;">
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">小窍门</label>
+            <div class="layui-input-block">
+                <textarea name="tip" id="seo_description"  placeholder="小窍门" class="layui-textarea" style="width: 50%;">{$DataStr['tip']}</textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-inline">
+                <input type="checkbox" checked="" name="status" lay-skin="switch" lay-filter="switchTest" title="开关"><div class="layui-unselect layui-form-switch layui-form-onswitch"><i></i></div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit="" lay-filter="add-role" data-href="{:url('greens_update')}">立即提交</button>
+                <a class="layui-btn layui-btn-small do-action" data-type="doGoBack" data-href=""><i class="fa fa-mail-reply"></i>返回上一页</a>
+            </div>
+        </div>
+    </form>
+
+</div>
+<div id="demo" class="demo"></div>
+
+{include file="public/footer"}
+
+<script type="text/javascript" src="__UPDATE__/control/js/zyUpdate.js"></script><!-- 加载文件上传插件页面 -->
+<script type="text/javascript" src="__UPDATE__/control/js/zyUpdateLayui.js"></script><!-- 加载文件上传js文件 -->
+<script>
+    var imgUrl;
+    layui.use(['form','common','upload'], function(){
+         layui.upload({
+            url: '' //上传接口
+            ,success: function(res){ //上传成功后的回调
+              console.log(res)
+            }
+          });
+          //上传封面图片
+        layui.upload({
+                // url: "/admin/Upload/uploadProjectImage"
+             url: "{:url('Upload/uploadProjectImage')}" //上传接口
+            ,before: function(input){
+                //返回的参数item，即为当前的input DOM对象
+                console.log('图片上传中');
+            }
+            ,title:'上传封面图'
+            ,elem: '#upload_ad_image' //指定原始元素，默认直接查找class="layui-upload-file"
+            ,method: 'post' //上传接口的http类型
+            ,ext: 'jpg|png|gif'
+            ,type:'images'
+            ,success: function(data){ //上传成功后的回调
+                //console.log(res)
+                if(data.status == 1){
+                    $("#images").val('/upload/testfile/' +data.image_name);
+                    $("#default_img").attr('src', '/FlowProject/Food_test/public/upload/testfile/' + data.image_name).show();
+                }else{
+                    alert(data.error_info);
+                }
+
+            }
+        });
+        var $ = layui.jquery
+                ,common=layui.common
+                ,form = layui.form();
+        //自定义验证规则
+        // form.verify({
+        //     name:function(value){
+        //         if(value == ""){
+        //             return '会员名称不能为空';
+        //         }
+        //     }
+
+        // });
+
+        //点击追加菜单清单
+          $("#GetAnchor").click(function(){
+            var _this = this;
+            $(".GetAnchor").append('<div class="layui-form-item getDIv" style="margin:10px 0 0 110px;width:800px;">\
+                  <div class="layui-input-inline">\
+                  <input class="layui-input" type="text" value="" name="food_name" placeholder="食材名称--例：花生"  lay-verify="m_number">\
+              </div>\
+              <div class="layui-input-inline" style="">\
+                  <input class="layui-input" type="text" value="" name="food_how" placeholder="食材量--例如：50g"  lay-verify="m_name">\
+              </div>\
+                  <button type="button" style="width:35px;height: 38px;" class="GetAnchorRemove layui-btn layui-btn-small" ><span style="font-size:20px;">-</span></button>\
+                </div>');
+          })
+
+          //删除追加div
+          $(document).on("click",".GetAnchorRemove",function(){
+            $(this).parent().remove();
+            // $(".getDIv").remove();
+          })
+
+        //监听提交
+        form.on('submit(add-role)', function(data){
+            var sub=true;
+            var url=$(this).data('href');
+
+            var food_name = new Array();//食材名称
+            var food_how = new Array();//食材量
+            //食材名称
+            $("input[name='food_name']").each(function(){
+                    food_name.push($(this).val());
+            })
+            //食材量
+            $("input[name='food_how']").each(function(){
+                    food_how.push($(this).val());
+            })
+            var ObjData = data.field;
+            ObjData.food_name = food_name;//合并食材名称
+            ObjData.food_how = food_how;//合并食材量
+
+            if(url){
+                if(sub){
+                    $.ajax({
+                        url: url,
+                        type: 'post',
+                        dataType: 'json',
+                        data: data.field,
+                        success: function (data) {
+                            if (data.code == 1) {
+                                // location.href = rturl;
+                                common.layerAlertS(data.msg, '提示');
+                                window.location.href = "{:url('greens_list')}";
+                            }
+                            else {
+                                common.layerAlertE(data.msg, '提示');
+                            }
+                        },
+                        // beforeSend: function () {
+                        //     //    // 一般是禁用按钮等防止用户重复提交
+                        //     $(data.elem).attr("disabled", "true").text("提交中...");
+                        // },
+                        //complete: function () {
+                        //    $(sbbtn).removeAttr("disabled");
+                        //},
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            common.layerAlertE(textStatus, '提示');
+                        }
+                    });
+                }
+            }else{
+                common.layerAlertE('链接错误！', '提示');
+            }
+
+            return false;
+        });
+    });
+</script>

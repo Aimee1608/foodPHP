@@ -1,0 +1,116 @@
+{include file="public/header" /}
+<style>
+    .layui-form-switch {
+        padding-left: 0px;
+        transition: .1s linear;
+    }
+
+</style>
+<div class="main-wrap">
+    <blockquote class="layui-elem-quote fhui-admin-main_hd">
+        <h2>数据库还原</h2>
+    </blockquote>
+
+    <div class="y-role">
+        <!--工具栏-->
+        <div id="floatHead" class="toolbar-wrap">
+            <div class="toolbar">
+                <div class="box-wrap">
+                    <a class="menu-btn"></a>
+                    <div class="l-list">
+
+                        <a class="layui-btn layui-btn-small do-action" data-type="doRefresh" data-href=""><i class="fa fa-refresh fa-spin"></i>刷新</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--/工具栏-->
+        <!--文字列表-->
+        <div class="fhui-admin-table-container">
+            <form id="export-form" method="post" action="{:url('export')}">
+                <table class="layui-table" lay-skin="line">
+                    <colgroup>
+                        <col width="15%">
+                        <col width="10%">
+                        <col width="5%">
+                        <col width="10%">
+                        <col width="12%">
+                        <col width="8%">
+                        <col width="15%">
+                    </colgroup>
+                    <thead>
+                    <tr>
+
+                        <th >备份名称</th>
+                        <th >卷数</th>
+                        <th >压缩</th>
+                        <th >数据大小</th>
+                        <th >备份时间</th>
+                        <th >状态</th>
+                        <th >操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {notempty name="data"}
+                            {volist name="data" id="vo"}
+                            <tr class="long-td">
+                                <td>{$vo.time|date='Ymd-His',###}</td>
+                                <td>{$vo.part}</td>
+                                <td>{$vo.compress}</td>
+                                <td>{$vo.size|format_bytes}</td>
+                                <td>{$key}</td>
+                                <td>-</td>
+                                <td>
+                                    <a class="layui-btn layui-btn-small db-import"  href="{:url('revert',['time'=>$vo['time']])}">还原</a>
+                                    <a class="layui-btn layui-btn-small do-action" data-type="doDelOne" data-href="{:url('del',['time'=>$vo['time']])}">删除</a>
+
+
+                                </td>
+                            </tr>
+                            {/volist}
+                        {else /}
+                            <td colspan="7" class="text-center"> 暂无备份数据</td>
+                        {/notempty}
+                    </tbody>
+                </table>
+            </form>
+        </div>
+
+    </div>
+</div>
+{include file="public/footer"}
+<!--<script src="__JS__/jquery.min.js?v=2.1.4"></script>-->
+<script>
+
+    layui.use(['layer','common'], function () {
+        var $ = layui.jquery
+                , layer = layui.layer;
+        $(".db-import").click(function () {
+            var self = this, status = ".";
+            $.get(self.href, success, "json");
+            window.onbeforeunload = function () { return "正在还原数据库，请不要关闭！";};
+            return false;
+            function success(data) {
+                if (data.code) {
+                    if (data.data.gz) {
+                        data.msg += status;
+                        if (status.length === 5) {
+                            status = ".";
+                        } else {
+                            status += ".";
+                        }
+                    }
+                    $(self).parent().prev().text(data.msg);
+                    if (data.data.part) {
+                        $.get(self.href, {"part": data.data.part, "start": data.data.start}, success, "json");
+                    } else {
+                        window.onbeforeunload = function () {return null;};
+                    }
+                } else {
+                    layer.alert(data.msg,0);
+                }
+            }
+        });
+    });
+</script>
+>

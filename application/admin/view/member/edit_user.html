@@ -1,0 +1,142 @@
+{include file="public/header"}
+
+
+<div class="main-wrap">
+    <blockquote class="layui-elem-quote fhui-admin-main_hd">
+        <h2>添加会员</h2>
+    </blockquote>
+    <form class="layui-form" action="add_article">
+        <div class="layui-form-item">
+            <label class="layui-form-label">会员名称</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="username" placeholder="会员名称"  lay-verify="name" value="{$member.username}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">真实姓名</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="nickname" placeholder="排序"  lay-verify="required" value="{$member.nickname}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">会员等级</label>
+            <div class="layui-input-inline">
+                <select name="leval_id"  lay-verify="required">
+
+                    <option value="">请选择</option>
+                    {if !empty($level_list)}
+                    {foreach name="level_list" item="vo"}
+                    <option value="{$vo.id}">{$vo.leval_name}</option>
+                    {/foreach}
+                    {/if}
+                </select>
+
+            </div>
+
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">密码</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="password" name="password" placeholder="密码"  lay-verify="required">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">确认密码</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="password" name="confirm_password" placeholder="确认密码"  lay-verify="required">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">电子邮箱</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="email" placeholder="邮箱"  lay-verify="email" value="{$member.email}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">手机号</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="phone" placeholder="手机号" value="{$member.phone}">
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">个性签名</label>
+            <div class="layui-input-block">
+                <textarea name="signature"  placeholder="个性签名" class="layui-textarea" style="width: 50%;" value="{$member.signature}"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-inline">
+                <input type="checkbox" checked="" name="status" lay-skin="switch" lay-filter="switchTest" title="开关"><div class="layui-unselect layui-form-switch layui-form-onswitch"><i></i></div>
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit="" lay-filter="add-role" data-href="{:url('edit_user')}">立即提交</button>
+                <a class="layui-btn layui-btn-small do-action" data-type="doGoBack" data-href=""><i class="fa fa-mail-reply"></i>返回上一页</a>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+
+{include file="public/footer"}
+<script>
+    layui.use(['form','common'], function(){
+        var $ = layui.jquery
+                ,common=layui.common
+                ,form = layui.form();
+        //自定义验证规则
+        form.verify({
+            name:function(value){
+                if(value == ""){
+                    return '会员名称不能为空';
+                }
+            }
+
+        });
+
+        //监听提交
+        form.on('submit(add-role)', function(data){
+            var sub=true;
+            var url=$(this).data('href');
+            if(url){
+                if(sub){
+                    $.ajax({
+                        url: url,
+                        type: 'post',
+                        dataType: 'json',
+                        data: data.field,
+                        success: function (data) {
+                            if (data.code == 1) {
+                                // location.href = rturl;
+                                common.layerAlertS(data.msg, '提示');
+                                window.location.href="{:url('member/index')}";
+                            }
+                            else {
+                                common.layerAlertE(data.msg, '提示');
+                            }
+                        },
+                        beforeSend: function () {
+                            //    // 一般是禁用按钮等防止用户重复提交
+                            $(data.elem).attr("disabled", "true").text("提交中...");
+                        },
+                        //complete: function () {
+                        //    $(sbbtn).removeAttr("disabled");
+                        //},
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            common.layerAlertE(textStatus, '提示');
+                        }
+                    });
+                }
+            }else{
+                common.layerAlertE('链接错误！', '提示');
+            }
+
+            return false;
+        });
+    });
+</script>
